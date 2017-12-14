@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Calculator" basedir="." default="junit">
+
+    <property name="src.dir"     value="src"/>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="${build.dir}/jar"/>
+    <property name="report.dir"  value="${build.dir}/junitreport"/>
+    <property name="jacoco.dir"  value="${build.dir}/jacocoreport"/>
+    <property name="main-class"  value="Calculator"/>
+
+
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${report.dir}"/>
+        <mkdir dir="${jacoco.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean"/>
+
+    <path id="application" location="${jar.dir}/${ant.project.name}.jar"/>
+        <path id="test.path" location="test"/>
+
+    <target name="junit" depends="jar">
+       <mkdir dir="${report.dir}"/>
+       <junit printsummary="yes" haltonfailure="no" fork="yes" >
+        <classpath location="lib/junit-4.12.jar" />
+        <classpath location="lib/hamcrest-1.10.jar" />
+        <classpath>
+                <path refid="application"/>
+            </classpath>
+        <classpath>
+                <path refid="test.path"/>
+            </classpath>
+
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="test" includes="*Test.java"/>
+            </batchtest>
+</junit>
+    </target>
+
+    <target name="junitreport" depends="junit">
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}" includes="TEST-*.xml"/>
+            <report todir="${report.dir}"/>
+        </junitreport>
+    </target>
+    
+    </project>
+            
